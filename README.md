@@ -1,0 +1,28 @@
+# Orion
+A complex pendulum designed as a 3D printed cylinder, using an Arduino Micro, Solonoid, Accelerometer and Gyro to attempt to increase the period solely by altering the internal structure of the pendulum
+
+# Anti-Dampening Pendulum
+Jeff Taylor-Chang and Mike Perreault
+
+## Introduction
+For the final project, we have designed a pendulum with the goal of making it capable of resisting dampening, more representative of an ideal pendulum. A typical simple pendulum that is subject to resistance will slowly come to a stop and the pendulum’s amplitude decreases from lost energy. If there were no resistive forces, the pendulum would have ideal behavior and the cycles would remain constant in time and amplitude. To counteract dampening of the pendulum swing, the pendulum needs to increase its total mechanical energy as it swings to account for the energy lost from resistance. The way we have achieved that is by altering the position of the center of mass of the pendulum bob, internally, at the peak of the swing. Since the center of mass has increased, the potential energy and therefore the total mechanical energy of the bob has increased. The potential energy is then converted to kinetic as it swings. Because the pendulum has more total mechanical energy, it will swing for longer.
+
+## Design and Solutions
+The problem is that this cannot be repeated without some sort of reset. The method of altering the position of the center of mass of the bob was by using a solenoid. The solenoid, upon receiving an electrical current, has a shaft that retracts. This is achieved by generating a magnetic field through the shaft which pulls the shaft into the solenoid housing. When the current is turned off, a spring returns the solenoid shaft to its original position. We created and 3D printed a pendulum bob that had a housing for the solenoid. By fastening the solenoid shaft end to the bob, the solenoid pulls its housing upwards when supplied a current, shifting the position of the center of mass via electrical current. However, the solenoid must be in the off position when it reaches a peak in order to then move the center of mass. To achieve this, the solenoid returns to the off position as the pendulum swings towards its lowest point, and the potential energy has been converted to kinetic energy. This transition supplements the mechanical energy of the pendulum bob, compensating for some of the lost energy from resistive forces. This process is repeated, adding mechanical energy to the system while it is being lost, and thus maintaining the pendulum for longer than without it. The solenoid pulls along the radius, increasing the tension of the string but only shifting the solenoid mass.
+In order to detect a peak, we use an accelerometer mounted to the bottom of the pendulum bob. Since the accelerometer is mounted such that one of the axis is always perpendicular to the path, we can detect the radial acceleration of the circular orbit. When the pendulum hits a peak, the orbital velocity hits zero and the radial acceleration, equal to the velocity squared over the radius of the orbit, is also zero. We can combine this with the gyroscope built into the accelerometer. By detecting a local maxima or minima over a few samples, we can accurately determine when the pendulum has peaked.
+In order to process the sensor data and control the solenoid, we are using an Arduino microcontroller. The microcontroller receives inputs from the accelerometer at roughly 10 times per second and handles calibration of the sensor. However, the solenoid runs on 12V and the microcontroller can only supply 5V. In order to power the solenoid, we use a wall AC adapter that provides a positive and negative lead for a 12V circuit. If we used that voltage for the microcontroller, it would fry the microcontroller and the accelerometer. To bridge this, we used a transistor and diode circuit that runs with 12V but has a gate controlled by the microcontroller. Sending a current through the control pin on the transistor results in the transistor allowing the 12V circuit to complete and the solenoid receives power. We have also wired an LED into the solenoid circuit to indicate when the circuit is completed.
+
+## Operation
+In order to use the pendulum, the pendulum must be started at its base position and allowed to calibrate. Once it is done calibrating, an LED lights up to say the system is ready. The pendulum must then be released from a small peak and it will handle the rest. If the calibration fails while it is operating, the calibration LED will shut off. The calibration LED is blue. The green and red LED’s indicate that the sensor is detecting the motion of the pendulum.
+In order to test the functionality of the system, we zero the system using a reset button at its base position. Once the indicator shows that the system is ready, we lift the pendulum to a constant height and release without the solenoid being powered. The microcontroller records the time from the release to the time that the pendulum swing has decayed to a minimum threshold angle. We then repeat the process but with the solenoid circuit activated and then compare the times.
+
+## Conclusion and Results
+
+### Runtime as Regular Pendulum (s)
+34.1s, 36.2s, 33.5s, Average: 34.6s
+
+### Runtime as Complex Pendulum (s)
+41.3s, 39.8s, 40.2s, Average: 40.4s
+
+### Final Statements
+When lifted to a starting height of 20cm, the complex pendulum swung for roughly 6 seconds longer, about a 17% increase. Therefore our system of reducing dampening appears to work, producing longer runtimes from the pendulum with it enabled than with the same pendulum when anti-dampening is disabled.
